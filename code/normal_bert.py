@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
-from pytorch_transformers import *
-
+from pytransformers import *
 
 class ClassificationBert(nn.Module):
     def __init__(self, num_labels=2):

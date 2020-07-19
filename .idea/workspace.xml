@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="5b1ef491-cc28-42bb-bc26-1a0149e1ed87" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/MixText.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/MixText.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/mixtext.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/mixtext.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/normal_bert.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/normal_bert.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/normal_train.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/normal_train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/read_data.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/read_data.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/__main__.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/__main__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/configuration_auto.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/configuration_auto.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/configuration_bert.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/configuration_bert.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/configuration_distilbert.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/configuration_distilbert.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/configuration_gpt2.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/configuration_gpt2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/configuration_openai.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/configuration_openai.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/configuration_roberta.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/configuration_roberta.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/configuration_transfo_xl.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/configuration_transfo_xl.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/configuration_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/configuration_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/configuration_xlm.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/configuration_xlm.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/configuration_xlnet.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/configuration_xlnet.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/convert_bert_original_tf_checkpoint_to_pytorch.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/convert_bert_original_tf_checkpoint_to_pytorch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/convert_bert_pytorch_checkpoint_to_original_tf.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/convert_bert_pytorch_checkpoint_to_original_tf.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/convert_gpt2_original_tf_checkpoint_to_pytorch.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/convert_gpt2_original_tf_checkpoint_to_pytorch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/convert_openai_original_tf_checkpoint_to_pytorch.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/convert_openai_original_tf_checkpoint_to_pytorch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/convert_pytorch_checkpoint_to_tf2.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/convert_pytorch_checkpoint_to_tf2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/convert_roberta_original_pytorch_checkpoint_to_pytorch.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/convert_roberta_original_pytorch_checkpoint_to_pytorch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/convert_transfo_xl_original_tf_checkpoint_to_pytorch.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/convert_transfo_xl_original_tf_checkpoint_to_pytorch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/convert_xlm_original_pytorch_checkpoint_to_pytorch.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/convert_xlm_original_pytorch_checkpoint_to_pytorch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/convert_xlnet_original_tf_checkpoint_to_pytorch.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/convert_xlnet_original_tf_checkpoint_to_pytorch.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/data/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/data/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/data/metrics/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/data/metrics/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/data/processors/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/data/processors/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/data/processors/glue.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/data/processors/glue.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/data/processors/utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/data/processors/utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/file_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/file_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/modeling_auto.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/modeling_auto.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/modeling_bert.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/modeling_bert.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/modeling_distilbert.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/modeling_distilbert.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/modeling_gpt2.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/modeling_gpt2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/modeling_openai.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/modeling_openai.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/modeling_roberta.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/modeling_roberta.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/modeling_tf_auto.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/modeling_tf_auto.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/modeling_tf_bert.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/modeling_tf_bert.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/modeling_tf_distilbert.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/modeling_tf_distilbert.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/modeling_tf_gpt2.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/modeling_tf_gpt2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/modeling_tf_openai.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/modeling_tf_openai.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/modeling_tf_pytorch_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/modeling_tf_pytorch_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/modeling_tf_roberta.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/modeling_tf_roberta.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/modeling_tf_transfo_xl.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/modeling_tf_transfo_xl.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/modeling_tf_transfo_xl_utilities.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/modeling_tf_transfo_xl_utilities.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/modeling_tf_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/modeling_tf_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/modeling_tf_xlm.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/modeling_tf_xlm.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/modeling_tf_xlnet.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/modeling_tf_xlnet.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/modeling_transfo_xl.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/modeling_transfo_xl.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/modeling_transfo_xl_utilities.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/modeling_transfo_xl_utilities.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/modeling_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/modeling_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/modeling_xlm.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/modeling_xlm.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/modeling_xlnet.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/modeling_xlnet.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/optimization.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/optimization.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/configuration_common_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/configuration_common_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/conftest.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/conftest.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/fixtures/input.txt" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/fixtures/input.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/fixtures/sample_text.txt" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/fixtures/sample_text.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/fixtures/test_sentencepiece.model" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/fixtures/test_sentencepiece.model" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/modeling_auto_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/modeling_auto_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/modeling_bert_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/modeling_bert_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/modeling_common_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/modeling_common_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/modeling_distilbert_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/modeling_distilbert_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/modeling_gpt2_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/modeling_gpt2_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/modeling_openai_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/modeling_openai_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/modeling_roberta_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/modeling_roberta_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/modeling_tf_auto_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/modeling_tf_auto_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/modeling_tf_bert_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/modeling_tf_bert_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/modeling_tf_common_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/modeling_tf_common_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/modeling_tf_distilbert_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/modeling_tf_distilbert_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/modeling_tf_gpt2_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/modeling_tf_gpt2_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/modeling_tf_openai_gpt_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/modeling_tf_openai_gpt_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/modeling_tf_roberta_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/modeling_tf_roberta_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/modeling_tf_transfo_xl_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/modeling_tf_transfo_xl_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/modeling_tf_xlm_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/modeling_tf_xlm_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/modeling_tf_xlnet_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/modeling_tf_xlnet_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/modeling_transfo_xl_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/modeling_transfo_xl_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/modeling_xlm_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/modeling_xlm_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/modeling_xlnet_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/modeling_xlnet_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/optimization_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/optimization_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/tokenization_auto_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/tokenization_auto_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/tokenization_bert_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/tokenization_bert_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/tokenization_distilbert_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/tokenization_distilbert_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/tokenization_gpt2_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/tokenization_gpt2_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/tokenization_openai_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/tokenization_openai_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/tokenization_roberta_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/tokenization_roberta_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/tokenization_tests_commons.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/tokenization_tests_commons.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/tokenization_transfo_xl_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/tokenization_transfo_xl_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/tokenization_utils_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/tokenization_utils_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/tokenization_xlm_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/tokenization_xlm_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tests/tokenization_xlnet_test.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tests/tokenization_xlnet_test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tokenization_auto.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tokenization_auto.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tokenization_bert.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tokenization_bert.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tokenization_distilbert.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tokenization_distilbert.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tokenization_gpt2.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tokenization_gpt2.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tokenization_openai.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tokenization_openai.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tokenization_roberta.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tokenization_roberta.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tokenization_transfo_xl.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tokenization_transfo_xl.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tokenization_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tokenization_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tokenization_xlm.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tokenization_xlm.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/code/transformers/tokenization_xlnet.py" beforeDir="false" afterPath="$PROJECT_DIR$/code/pytransformers/tokenization_xlnet.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/yahoo_answers_csv/Pre-process.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/data/yahoo_answers_csv/Pre-process.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/yahoo_answers_csv/back_translate.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/data/yahoo_answers_csv/back_translate.ipynb" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1eo8EFtql0Ji5LoJBymqtZJVhSS" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="5b1ef491-cc28-42bb-bc26-1a0149e1ed87" name="Default Changelist" comment="" />
+      <created>1594976471786</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1594976471786</updated>
+    </task>
+    <servers />
+  </component>
+</project>

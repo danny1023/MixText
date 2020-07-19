@@ -39,7 +39,7 @@
 
 ### 预处理数据
 
-对于雅虎数据，我们拼接问题标题，问题内容和最佳答案形成一个文本去分类， 预处理的雅虎问答数据可以通过这里下载 [here](https://drive.google.com/file/d/1IoX9dp_RUHwIVA2_kJgHCWBOLHsV9V7A/view?usp=sharing). 
+对于雅虎数据，我们拼接问题和标题，问题内容和最佳答案形成一个文本去分类， 预处理的雅虎问答数据可以通过这里下载 [here](https://drive.google.com/file/d/1IoX9dp_RUHwIVA2_kJgHCWBOLHsV9V7A/view?usp=sharing). 
 
 注意AG News和 DB Pedia，我们只利用数据内容分类，不利于标题 ， 对于IMDB数据不做预处理
 
@@ -55,8 +55,7 @@
 #### 训练 BERT baseline model
 首先运行`./code/normal_train.py` 训练Bert的baseline模型，只使用于有标签的训练集
 ```
-python ./code/normal_train.py --gpu 0,1 --n-labeled 10 --data-path ./data/yahoo_answers_csv/ \
---batch-size 8 --epochs 20 
+python ./code/normal_train.py --gpu 0,1 --n-labeled 10 --data-path ../data/yahoo_answers_csv/ --batch-size 8 --epochs 20 
 ```
 
 #### 训练 TMix model

@@ -8,97 +8,102 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.data as Data
-from pytorch_transformers import *
+from pytransformers import *
 from torch.autograd import Variable
 from torch.utils.data import Dataset
 
-from read_data import *
+from read_data import get_data
 from mixtext import MixText
 
 
 parser = argparse.ArgumentParser(description='PyTorch MixText')
 
 parser.add_argument('--epochs', default=50, type=int, metavar='N',
-                    help='number of total epochs to run')
+                    help='运行多少epoch')
 parser.add_argument('--batch-size', default=4, type=int, metavar='N',
-                    help='train batchsize')
+                    help='有标签数据训练批次大小')
 parser.add_argument('--batch-size-u', default=24, type=int, metavar='N',
-                    help='train batchsize')
+                    help='无标签数据训练批次大小')
 
 parser.add_argument('--lrmain', '--learning-rate-bert', default=0.00001, type=float,
-                    metavar='LR', help='initial learning rate for bert')
+                    metavar='LR', help='bert的初始学习率')
 parser.add_argument('--lrlast', '--learning-rate-model', default=0.001, type=float,
-                    metavar='LR', help='initial learning rate for models')
+                    metavar='LR', help='Mixtext的模型初始学习率')
 
 parser.add_argument('--gpu', default='0,1,2,3', type=str,
                     help='id(s) for CUDA_VISIBLE_DEVICES')
 
 parser.add_argument('--n-labeled', type=int, default=20,
-                    help='number of labeled data')
+                    help='划分出有标签数据的数据个数')
 
 parser.add_argument('--un-labeled', default=5000, type=int,
-                    help='number of unlabeled data')
+                    help='划分出无标签数据的数据个数')
 
 parser.add_argument('--val-iteration', type=int, default=200,
-                    help='number of labeled data')
+                    help='迭代次数')
 
 
 parser.add_argument('--mix-option', default=True, type=bool, metavar='N',
-                    help='mix option, whether to mix or not')
+                    help='mix选项,是否要进行mix操作')
 parser.add_argument('--mix-method', default=0, type=int, metavar='N',
-                    help='mix method, set different mix method')
+                    help='mix方法, 设置不同的mix方法')
 parser.add_argument('--separate-mix', default=False, type=bool, metavar='N',
-                    help='mix separate from labeled data and unlabeled data')
+                    help='从有标签和无标签数据分开mix')
 parser.add_argument('--co', default=False, type=bool, metavar='N',
-                    help='set a random choice between mix and unmix during training')
+                    help='训练时是否随机选择在mix和unmix之间')
 parser.add_argument('--train_aug', default=False, type=bool, metavar='N',
-                    help='augment labeled training data')
+                    help='训练数据是否数据增强')
 
-
-parser.add_argument('--model', type=str, default='bert-base-uncased',
-                    help='pretrained model')
+parser.add_argument('--model', type=str, default='bert-base-chinese',
+                    help='使用的预训练模型,默认中文bert模型')
 
 parser.add_argument('--data-path', type=str, default='yahoo_answers_csv/',
-                    help='path to data folders')
+                    help='数据集路径')
 
 parser.add_argument('--mix-layers-set', nargs='+',
-                    default=[0, 1, 2, 3], type=int, help='define mix layer set')
+                    default=[0, 1, 2, 3], type=int, help='mix的层的集合，指定那些层做mix')
 
 parser.add_argument('--alpha', default=0.75, type=float,
-                    help='alpha for beta distribution')
+                    help='beta分布的alpha参数')
 
 parser.add_argument('--lambda-u', default=1, type=float,
-                    help='weight for consistency loss term of unlabeled data')
+                    help='无标签数据连续损失的权重')
 parser.add_argument('--T', default=0.5, type=float,
-                    help='temperature for sharpen function')
+                    help='sharpen function的温度选项')
 
-parser.add_argument('--temp-change', default=1000000, type=int)
+parser.add_argument('--temp-change', default=1000000, type=int, help='步数大于多少时改变sharpen function的温度值')
 
 parser.add_argument('--margin', default=0.7, type=float, metavar='N',
-                    help='margin for hinge loss')
+                    help='hinge loss边界')
 parser.add_argument('--lambda-u-hinge', default=0, type=float,
-                    help='weight for hinge loss term of unlabeled data')
+                    help='无标签数据的hinge loss权重')
 
 args = parser.parse_args()
 
+#GPU相关设置, 设置为0表示不适用gpu
 os.environ['CUDA_VISIBLE_DEVICES'] = args.gpu
 use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 n_gpu = torch.cuda.device_count()
-print("GPU num: ", n_gpu)
+if n_gpu == 0:
+    print("GPU 数量为0，使用CPU")
+else:
+    print("可以使用的GPU 数量: ", n_gpu)
+
 
 best_acc = 0
 total_steps = 0
 flag = 0
-print('Whether mix: ', args.mix_option)
-print("Mix layers sets: ", args.mix_layers_set)
+print('是否要进行mix: ', args.mix_option)
+print("Mix层集合: ", args.mix_layers_set)
 
 
 def main():
     global best_acc
-    # Read dataset and build dataloaders
+    # 读取 dataset 和构建 dataloaders
     train_labeled_set, train_unlabeled_set, val_set, test_set, n_labels = get_data(
         args.data_path, args.n_labeled, args.un_labeled, model=args.model, train_aug=args.train_aug)
+    # 制作loader
     labeled_trainloader = Data.DataLoader(
         dataset=train_labeled_set, batch_size=args.batch_size, shuffle=True)
     unlabeled_trainloader = Data.DataLoader(
@@ -108,27 +113,31 @@ def main():
     test_loader = Data.DataLoader(
         dataset=test_set, batch_size=512, shuffle=False)
 
-    # Define the model, set the optimizer
-    model = MixText(n_labels, args.mix_option).cuda()
+    # 定义模型，设置优化器
+    if n_gpu == 0:
+        model = MixText(n_labels, args.mix_option, model=args.model)
+    else:
+        model = MixText(n_labels, args.mix_option, model=args.model).cuda()
     model = nn.DataParallel(model)
+    #优化器参数
     optimizer = AdamW(
         [
             {"params": model.module.bert.parameters(), "lr": args.lrmain},
             {"params": model.module.linear.parameters(), "lr": args.lrlast},
         ])
-
+    #预热步数
     num_warmup_steps = math.floor(50)
     num_total_steps = args.val_iteration
 
     scheduler = None
     #WarmupConstantSchedule(optimizer, warmup_steps=num_warmup_steps)
-
+    #训练损失函数
     train_criterion = SemiLoss()
     criterion = nn.CrossEntropyLoss()
 
     test_accs = []
 
-    # Start training
+    #开始训练
     for epoch in range(args.epochs):
 
         train(labeled_trainloader, unlabeled_trainloader, model, optimizer,
@@ -156,21 +165,33 @@ def main():
 
         print('Epoch: ', epoch)
 
-        print('Best acc:')
+        print('最好的准确率')
         print(best_acc)
 
-        print('Test acc:')
+        print('测试集准确率')
         print(test_accs)
 
-    print("Finished training!")
-    print('Best acc:')
+    print("完成训练")
+    print('最好的准去率')
     print(best_acc)
 
-    print('Test acc:')
+    print('测试准确率')
     print(test_accs)
 
 
 def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, scheduler, criterion, epoch, n_labels, train_aug=False):
+    """
+    :param labeled_trainloader:
+    :param unlabeled_trainloader:
+    :param model:  Mixtext 模型
+    :param optimizer: 优化器
+    :param scheduler:
+    :param criterion: 损失函数
+    :param epoch:
+    :param n_labels: 标签类别数量
+    :param train_aug: 是否使用数据增强
+    :return:
+    """
     labeled_train_iter = iter(labeled_trainloader)
     unlabeled_train_iter = iter(unlabeled_trainloader)
     model.train()
@@ -178,7 +199,7 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, schedule
     global total_steps
     global flag
     if flag == 0 and total_steps > args.temp_change:
-        print('Change T!')
+        print('改变sharpen function的温度选项')
         args.T = 0.9
         flag = 1
 
@@ -212,16 +233,16 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, schedule
         batch_size_2 = inputs_ori.size(0)
         targets_x = torch.zeros(batch_size, n_labels).scatter_(
             1, targets_x.view(-1, 1), 1)
-
-        inputs_x, targets_x = inputs_x.cuda(), targets_x.cuda(non_blocking=True)
-        inputs_u = inputs_u.cuda()
-        inputs_u2 = inputs_u2.cuda()
-        inputs_ori = inputs_ori.cuda()
+        if n_gpu != 0:
+            inputs_x, targets_x = inputs_x.cuda(), targets_x.cuda(non_blocking=True)
+            inputs_u = inputs_u.cuda()
+            inputs_u2 = inputs_u2.cuda()
+            inputs_ori = inputs_ori.cuda()
 
         mask = []
 
         with torch.no_grad():
-            # Predict labels for unlabeled data.
+            # 对无标签数据预测标签
             outputs_u = model(inputs_u)
             outputs_u2 = model(inputs_u2)
             outputs_ori = model(inputs_ori)
@@ -291,7 +312,7 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, schedule
         length_a, length_b = all_lengths, all_lengths[idx]
 
         if args.mix_method == 0:
-            # Mix sentences' hidden representations
+            # Mix句子的隐藏向量
             logits = model(input_a, input_b, l, mix_layer)
             mixed_target = l * target_a + (1 - l) * target_b
 
@@ -309,8 +330,10 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, schedule
                         length2 = 256-length1 - 1
                     idx2 = torch.randperm(int(length_b[i]) - length2 + 1)[0]
                     try:
-                        mixed_input.append(
-                            torch.cat((input_a[i][idx1: idx1 + length1], torch.tensor([102]).cuda(), input_b[i][idx2:idx2 + length2], torch.tensor([0]*(256-1-length1-length2)).cuda()), dim=0).unsqueeze(0))
+                        if n_gpu !=0:
+                            mixed_input.append(torch.cat((input_a[i][idx1: idx1 + length1], torch.tensor([102]).cuda(), input_b[i][idx2:idx2 + length2], torch.tensor([0]*(256-1-length1-length2)).cuda()), dim=0).unsqueeze(0))
+                        else:
+                            mixed_input.append(torch.cat((input_a[i][idx1: idx1 + length1], torch.tensor([102]), input_b[i][idx2:idx2 + length2], torch.tensor([0]*(256-1-length1-length2))), dim=0).unsqueeze(0))
                     except:
                         print(256 - 1 - length1 - length2,
                               idx2, length2, idx1, length1)
@@ -329,9 +352,10 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, schedule
             if l == 1:
                 mixed_input = []
                 for i in range(input_a.size(0)):
-                    mixed_input.append(
-                        torch.cat((input_a[i][:length_a[i]], torch.tensor([102]).cuda(), input_b[i][:length_b[i]], torch.tensor([0]*(512-1-int(length_a[i])-int(length_b[i]))).cuda()), dim=0).unsqueeze(0))
-
+                    if n_gpu != 0:
+                        mixed_input.append(torch.cat((input_a[i][:length_a[i]], torch.tensor([102]).cuda(), input_b[i][:length_b[i]], torch.tensor([0]*(512-1-int(length_a[i])-int(length_b[i]))).cuda()), dim=0).unsqueeze(0))
+                    else:
+                        mixed_input.append(torch.cat((input_a[i][:length_a[i]], torch.tensor([102]), input_b[i][:length_b[i]], torch.tensor([0]*(512-1-int(length_a[i])-int(length_b[i])))), dim=0).unsqueeze(0))
                 mixed_input = torch.cat(mixed_input, dim=0)
                 logits = model(mixed_input, sent_size=512)
 
@@ -373,7 +397,8 @@ def validate(valloader, model, criterion, epoch, mode):
         correct = 0
 
         for batch_idx, (inputs, targets, length) in enumerate(valloader):
-            inputs, targets = inputs.cuda(), targets.cuda(non_blocking=True)
+            if n_gpu !=0:
+                inputs, targets = inputs.cuda(), targets.cuda(non_blocking=True)
             outputs = model(inputs)
             loss = criterion(outputs, targets)
 
@@ -405,17 +430,28 @@ def linear_rampup(current, rampup_length=args.epochs):
 
 class SemiLoss(object):
     def __call__(self, outputs_x, targets_x, outputs_u, targets_u, outputs_u_2, epoch, mixed=1):
-
+        """
+        半监督损失函数
+        :param outputs_x: 模型输出的x
+        :param targets_x: 真实的x
+        :param outputs_u: 模型输出的无标签的x
+        :param targets_u:  真实的无标签的x
+        :param outputs_u_2: 模型输出的无标签x_2
+        :param epoch:  迭代次数
+        :param mixed:
+        :return:
+        """
         if args.mix_method == 0 or args.mix_method == 1:
 
+            #有监督的x的损失
             Lx = - \
                 torch.mean(torch.sum(F.log_softmax(
                     outputs_x, dim=1) * targets_x, dim=1))
-
+            #无监督的x输出的概率值
             probs_u = torch.softmax(outputs_u, dim=1)
-
+            #论文中公式显示的kl散度, batch mean 批次均值作为统计计算KL散度
             Lu = F.kl_div(probs_u.log(), targets_u, None, None, 'batchmean')
-
+            #计算hinge Loss 折页损失 max(0,1-(wTxi +b)yi)
             Lu2 = torch.mean(torch.clamp(torch.sum(-F.softmax(outputs_u, dim=1)
                                                    * F.log_softmax(outputs_u, dim=1), dim=1) - args.margin, min=0))
 

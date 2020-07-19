@@ -2,13 +2,12 @@ import argparse
 import os
 import random
 import math
-
 import numpy as np
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.utils.data as Data
-from pytorch_transformers import *
+from pytransformers import *
 from torch.autograd import Variable
 from torch.utils.data import Dataset
 

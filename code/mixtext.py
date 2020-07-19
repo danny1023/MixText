@@ -1,16 +1,23 @@
 import torch
 import torch.nn as nn
-from pytorch_transformers import *
-from transformers.modeling_bert import BertEmbeddings, BertPooler, BertLayer
+from pytransformers import *
+from pytransformers.modeling_bert import BertEmbeddings, BertPooler, BertLayer
 
 
 class BertModel4Mix(BertPreTrainedModel):
     def __init__(self, config):
+        """
+        Bert模型改造成Mix
+        :param config:
+        """
         super(BertModel4Mix, self).__init__(config)
+        #做embedding
         self.embeddings = BertEmbeddings(config)
+        #模型
         self.encoder = BertEncoder4Mix(config)
+        #BertPooler 是一个全连接加一个tanh激活
         self.pooler = BertPooler(config)
-
+        #初始化参数
         self.init_weights()
 
     def _resize_token_embeddings(self, new_num_tokens):
@@ -95,9 +102,16 @@ class BertModel4Mix(BertPreTrainedModel):
 
 class BertEncoder4Mix(nn.Module):
     def __init__(self, config):
+        """
+
+        :param config:  Bert 模型的config， 默认是加载transformers的bert的config
+        """
         super(BertEncoder4Mix, self).__init__()
+        #是否输出attentions，默认为False
         self.output_attentions = config.output_attentions
+        #是否输出隐藏状态，默认为False
         self.output_hidden_states = config.output_hidden_states
+        #使用BertLayer配置模型, 组装模型
         self.layer = nn.ModuleList([BertLayer(config)
                                     for _ in range(config.num_hidden_layers)])
 
@@ -157,20 +171,32 @@ class BertEncoder4Mix(nn.Module):
 
 
 class MixText(nn.Module):
-    def __init__(self, num_labels=2, mix_option=False):
+    def __init__(self, num_labels=2, mix_option=False, model='bert-base-chinese'):
+        """
+        配置Mix模型或Bert模型
+        :param num_labels:标签个数，几分类
+        :param mix_option:  是否使用MixText模型，还是普通Bert模型
+        """
         super(MixText, self).__init__()
-
         if mix_option:
-            self.bert = BertModel4Mix.from_pretrained('bert-base-uncased')
+            self.bert = BertModel4Mix.from_pretrained(model)
         else:
-            self.bert = BertModel.from_pretrained('bert-base-uncased')
+            self.bert = BertModel.from_pretrained(model)
 
+        #最后一层全连接，做分类, 输出标签个数的分类
         self.linear = nn.Sequential(nn.Linear(768, 128),
                                     nn.Tanh(),
                                     nn.Linear(128, num_labels))
 
     def forward(self, x, x2=None, l=None, mix_layer=1000):
-
+        """
+        前向网络
+        :param x:
+        :param x2:
+        :param l:
+        :param mix_layer:
+        :return:
+        """
         if x2 is not None:
             all_hidden, pooler = self.bert(x, x2, l, mix_layer)
 
