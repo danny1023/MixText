@@ -221,7 +221,7 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, schedule
         mask = []
 
         with torch.no_grad():
-            # 对无标签数据预测标签, 预测出的类别置信度
+            # 对无标签数据预测标签, 预测出的类别置信度, 首先猜测无标签数据的低熵标签
             outputs_u = model(inputs_u)
             outputs_u2 = model(inputs_u2)
             outputs_ori = model(inputs_ori)
@@ -277,7 +277,7 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, schedule
                 [inputs_x_length, inputs_x_length, length_u, length_u2, length_ori], dim=0)
             all_targets = torch.cat(
                 [targets_x, targets_x, targets_u, targets_u, targets_u], dim=0)
-        #分别进行mix, 是从batch_size 获取，还是从全部数据获取
+        #分别进行mix, 是使用batch_size个还是全部，是从batch_size 获取，还是从全部数据获取
         if args.separate_mix:
             #随机打乱函数randperm，获取索引，就是把无标签，有标签和数据增强的数据随机抽取出来进行训练
             idx1 = torch.randperm(batch_size)
@@ -296,7 +296,7 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, schedule
         if args.mix_method == 0:
             # Mix句子的隐藏向量,input_a是所有输入，input_b是随机抽取的输入
             logits = model(input_a, input_b, lbeta, mix_layer)
-
+            #对target也使用Mixup混合，公式是论文上的公式
             mixed_target = lbeta * target_a + (1 - lbeta) * target_b
         elif args.mix_method == 1:
             # 拼接2个训练句子的片段，  片段的选择根据beta分布lbeta

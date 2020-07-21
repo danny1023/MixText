@@ -36,11 +36,11 @@ class BertModel4Mix(BertPreTrainedModel):
 
     def forward(self, input_ids, input_ids2=None, lbeta=None, mix_layer=1000, attention_mask=None, token_type_ids=None, position_ids=None, head_mask=None):
         """
-
+        设置各种mask和input_ids 做embedding，然后调用BertEncoder4Mix 计算hidden_state
         :param input_ids: encode后的id
         :param input_ids2: 另一个要mix的 encode的id
         :param lbeta: beta分布
-        :param mix_layer: 要做mix的层
+        :param mix_layer: 要做mix的层, 为了传递给BertEncoder4Mix
         :param attention_mask:  注意力的attention mask， 就是过滤掉padding的那些token
         :param token_type_ids: token 的类型id，就是属于哪个句子
         :param position_ids: transformer的position_id, 表示token的相对或者绝对位置等
@@ -53,7 +53,7 @@ class BertModel4Mix(BertPreTrainedModel):
             if input_ids2 is not None:
                 attention_mask2 = torch.ones_like(input_ids2)
             attention_mask = torch.ones_like(input_ids)
-
+        #设置token_type_ids
         if token_type_ids is None:
             # 0表示所有token都是属于同一个句子
             token_type_ids = torch.zeros_like(input_ids)
@@ -63,11 +63,11 @@ class BertModel4Mix(BertPreTrainedModel):
         extended_attention_mask = attention_mask.unsqueeze(1).unsqueeze(2)
         # 兼容fp16
         extended_attention_mask = extended_attention_mask.to(dtype=next(self.parameters()).dtype)
-        # 不明白这里做什么, extended_attention_mask变成了很小的值
+        # 不明白这里做什么, extended_attention_mask变成了00
         extended_attention_mask = (1.0 - extended_attention_mask) * -10000.0
 
         if input_ids2 is not None:
-            #与input_ids 同样的操作， extended_attention_mask2变成了很小的值
+            #与input_ids 同样的操作， extended_attention_mask2变成了很小的值, extended_attention_mask变成了0
             extended_attention_mask2 = attention_mask2.unsqueeze(1).unsqueeze(2)
             extended_attention_mask2 = extended_attention_mask2.to(dtype=next(self.parameters()).dtype)
             extended_attention_mask2 = (1.0 - extended_attention_mask2) * -10000.0
@@ -82,6 +82,7 @@ class BertModel4Mix(BertPreTrainedModel):
             # 转换成浮点数如果需要兼容f16
             head_mask = head_mask.to(dtype=next(self.parameters()).dtype)
         else:
+            #head_mask,  [None, None, None, None, None, None, None, None, None, None, None, None]
             head_mask = [None] * self.config.num_hidden_layers
         #id转换成词向量embedding_output [batch_size, seq_len, embedding_dimension]
         embedding_output = self.embeddings(
@@ -90,7 +91,7 @@ class BertModel4Mix(BertPreTrainedModel):
         if input_ids2 is not None:
             embedding_output2 = self.embeddings(
                 input_ids2, position_ids=position_ids, token_type_ids=token_type_ids2)
-
+        #把输入1和输入2的调用BertEncoder4Mix encdoer到一起
         if input_ids2 is not None:
             encoder_outputs = self.encoder(embedding_output, embedding_output2, lbeta, mix_layer,
                                            extended_attention_mask, extended_attention_mask2, head_mask=head_mask)
@@ -124,45 +125,48 @@ class BertEncoder4Mix(nn.Module):
 
     def forward(self, hidden_states, hidden_states2=None, lbeta=None, mix_layer=1000, attention_mask=None, attention_mask2=None, head_mask=None):
         """
-
+        BertEncoder4Mix, 真正的mix hidden states操作在这里
         :param hidden_states: 第一个输入的隐藏状态
         :param hidden_states2:第二个输入的隐藏状态
-        :param lbeta:
-        :param mix_layer:
-        :param attention_mask:
-        :param attention_mask2:
+        :param lbeta: beta分布取的值
+        :param mix_layer: 要mix的layer，例如这里是bert的第11层, 当不做mix时，设置默认mix_layer为1000，目的是为了下面循环不做mix
+        :param attention_mask: 输入1的 attention_mask
+        :param attention_mask2: 输入2的 attention_mask
         :param head_mask:
         :return:
         """
+        #保存每一层的hidden states和attentions，都放入列表
         all_hidden_states = ()
         all_attentions = ()
-        # 执行mix
+        # 执行mix，论文上的混合公式
         if mix_layer == -1:
             if hidden_states2 is not None:
+                #论文上的混合公式，得到新的混合的hidden_states
                 hidden_states = lbeta * hidden_states + (1 - lbeta) * hidden_states2
 
         for i, layer_module in enumerate(self.layer):
+            #当当前层小于或等于mix_layer时，inputs1 和inputs2 分别计算hidden_states
             if i <= mix_layer:
-                #是否输出隐藏状态
+                #是否输出隐藏状态，如果现在的layer小于要mix_layer,那么
                 if self.output_hidden_states:
                     all_hidden_states = all_hidden_states + (hidden_states,)
-                #调用transformers的BertLayer, 计算attention， 输出outputs
+                #调用transformers的BertLayer, 计算attention和hidden_states， 输出outputs
                 layer_outputs = layer_module(
                     hidden_states, attention_mask, head_mask[i])
-                #获取隐藏层状态
+                #获取这一次计算后的得到新的隐藏层状态
                 hidden_states = layer_outputs[0]
-                # 如果self.output_attentions 为True，输出attention
+                # 如果self.output_attentions 为True，输出attention，
                 if self.output_attentions:
                     all_attentions = all_attentions + (layer_outputs[1],)
-
+                #如果输入2存在，也做同样计算
                 if hidden_states2 is not None:
                     layer_outputs2 = layer_module(hidden_states2, attention_mask2, head_mask[i])
                     hidden_states2 = layer_outputs2[0]
-
+            # 只有当循环到等于mix_layer时，使用mixup公式混合
             if i == mix_layer:
                 if hidden_states2 is not None:
                     hidden_states = lbeta * hidden_states + (1 - lbeta) * hidden_states2
-
+            # 循环到大于mix_layer的层时, 普通方式计算
             if i > mix_layer:
                 if self.output_hidden_states:
                     all_hidden_states = all_hidden_states + (hidden_states,)
@@ -173,19 +177,19 @@ class BertEncoder4Mix(nn.Module):
                 if self.output_attentions:
                     all_attentions = all_attentions + (layer_outputs[1],)
 
-        # Add last layer
+        #最后一层结束后的hidden_states
         if self.output_hidden_states:
             all_hidden_states = all_hidden_states + (hidden_states,)
-
+        #outputs是最后一层的的hidden_states[batch_size,seq_len,Embedding_demision]
         outputs = (hidden_states,)
         if self.output_hidden_states:
             outputs = outputs + (all_hidden_states,)
         if self.output_attentions:
             outputs = outputs + (all_attentions,)
-        # last-layer hidden state, (all hidden states), (all attentions)
+        # 最后一层的hidden state, (all hidden states), (all attentions)
         return outputs
 
-
+# MixText 调用BertModel4Mix， BertModel4Mix调用BertEncoder4Mix
 class MixText(nn.Module):
     def __init__(self, num_labels=2, mix_option=False, model='bert-base-chinese'):
         """
@@ -225,6 +229,6 @@ class MixText(nn.Module):
             pooled_output = torch.mean(all_hidden, 1)
         #通过线性模型预测, pooled_output[batch_size, embedding_dim], 维度变成[batch_size, num_labels]
         predict = self.linear(pooled_output)
-
+        #返回预测值
         return predict
 
