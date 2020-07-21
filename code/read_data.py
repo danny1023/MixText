@@ -117,9 +117,11 @@ def train_val_split(labels, n_labeled_per_class, unlabeled_per_class, n_labels, 
     for i in range(n_labels):
         idxs = np.where(labels == i)[0]
         np.random.shuffle(idxs)
+        # 90%是划分为无标签训练集，剩余是验证集
+        unlabeled_idx = round((len(idxs) - 20) * 0.9) + 20
         train_labeled_idxs.extend(idxs[:n_labeled_per_class])
-        train_unlabeled_idxs.extend(idxs[n_labeled_per_class: 900])
-        val_idxs.extend(idxs[900:])
+        train_unlabeled_idxs.extend(idxs[n_labeled_per_class: unlabeled_idx])
+        val_idxs.extend(idxs[unlabeled_idx:])
     np.random.shuffle(train_labeled_idxs)
     np.random.shuffle(train_unlabeled_idxs)
     np.random.shuffle(val_idxs)
@@ -208,29 +210,43 @@ class loader_labeled(Dataset):
 
 
 class loader_unlabeled(Dataset):
-    def __init__(self, dataset_text, unlabeled_idxs, tokenizer, max_seq_len, aug=None):
+    def __init__(self, dataset_text, unlabeled_idxs, tokenizer, max_seq_len, train_aug=False):
         """
          # 无标签数据加载器
         :param dataset_text:
         :param unlabeled_idxs:
         :param tokenizer:
         :param max_seq_len:
-        :param aug:
+        :param train_aug: 是否做数据增强
         """
         self.tokenizer = tokenizer
         self.text = dataset_text
         self.ids = unlabeled_idxs
-        self.aug = aug
+        self.train_aug = train_aug
         self.max_seq_len = max_seq_len
+        #做一个空的字典，保存数据增强后的文本
+        self.trans_dist = {}
 
     def __len__(self):
         return len(self.text)
 
+    def augment(self, text):
+        """
+        数据增强, 翻译成英文，在翻译回中文
+        :param text: 单个文档的文本
+        :return:  新的列表，列表里面是生成后的文本
+        """
+        translator = Translator(service_urls=['translate.google.cn'])
+        if text not in self.trans_dist:
+            text1 = translator.translate(text, dest='en')
+            text2 = translator.translate(text1.text, dest='zh-cn')
+            self.trans_dist[text] = text2.text
+        return self.trans_dist[text], self.trans_dist[text], text
+
     def get_tokenized(self, text):
         """
-
-        :param text:
-        :return:
+        :param text: 接收纯文本
+        :return:返回encode后的数字id，和原始长度
         """
         tokens = self.tokenizer.tokenize(text)
         if len(tokens) > self.max_seq_len:
@@ -243,16 +259,19 @@ class loader_unlabeled(Dataset):
 
     def __getitem__(self, idx):
         """
-
-        :param idx:
+        对无标签数据做数据增强与否
+        :param idx:  int数字，迭代时的索引
         :return:
         """
-        if self.aug is not None:
-            u, v, ori = self.aug(self.text[idx], self.ids[idx])
-            encode_result_u, length_u = self.get_tokenized(u)
-            encode_result_v, length_v = self.get_tokenized(v)
-            encode_result_ori, length_ori = self.get_tokenized(ori)
+        #如果做数据增强
+        if self.train_aug:
+            # 数据增强的文本augtext_u和augtext_v， 原始文本ori_text
+            augtext_u, augtext_v, ori_text = self.augment(self.text[idx])
+            encode_result_u, length_u = self.get_tokenized(augtext_u)
+            encode_result_v, length_v = self.get_tokenized(augtext_v)
+            encode_result_ori, length_ori = self.get_tokenized(ori_text)
             return ((torch.tensor(encode_result_u), torch.tensor(encode_result_v), torch.tensor(encode_result_ori)), (length_u, length_v, length_ori))
+        #如果不做数据增强
         else:
             text = self.text[idx]
             encode_result, length = self.get_tokenized(text)

@@ -128,40 +128,34 @@ def main():
     #预热步数
     num_warmup_steps = math.floor(50)
     num_total_steps = args.val_iteration
-
+    #是否动态更新学习率
     scheduler = None
     #WarmupConstantSchedule(optimizer, warmup_steps=num_warmup_steps)
-    #训练损失函数
+    #训练损失函数，用在训练时
     train_criterion = SemiLoss()
+    #交叉熵损失, 用在验证集和测试集
     criterion = nn.CrossEntropyLoss()
-
     test_accs = []
 
     #开始训练
     for epoch in range(args.epochs):
-
+        #调用train函数, 给定有标签数据，无标签数据，模型，优化器，损失函数，labels数量，是否数据增强
         train(labeled_trainloader, unlabeled_trainloader, model, optimizer,
               scheduler, train_criterion, epoch, n_labels, args.train_aug)
 
         # scheduler.step()
-
-        # _, train_acc = validate(labeled_trainloader,
-        #                        model,  criterion, epoch, mode='Train Stats')
+        # _, train_acc = validate(labeled_trainloader, model,  criterion, epoch, mode='Train Stats')
         #print("epoch {}, train acc {}".format(epoch, train_acc))
 
-        val_loss, val_acc = validate(
-            val_loader, model, criterion, epoch, mode='Valid Stats')
+        val_loss, val_acc = validate(val_loader, model, criterion, epoch, mode='Valid Stats')
 
-        print("epoch {}, val acc {}, val_loss {}".format(
-            epoch, val_acc, val_loss))
+        print("epoch {}, 验证集准确率 {}, 验证集损失 {}".format(epoch, val_acc, val_loss))
 
         if val_acc >= best_acc:
             best_acc = val_acc
-            test_loss, test_acc = validate(
-                test_loader, model, criterion, epoch, mode='Test Stats ')
+            test_loss, test_acc = validate(test_loader, model, criterion, epoch, mode='Test Stats ')
             test_accs.append(test_acc)
-            print("epoch {}, test acc {},test loss {}".format(
-                epoch, test_acc, test_loss))
+            print("epoch {}, 测试集准确率 {},测试集损失 {}".format(epoch, test_acc, test_loss))
 
         print('Epoch: ', epoch)
 
@@ -181,11 +175,11 @@ def main():
 
 def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, scheduler, criterion, epoch, n_labels, train_aug=False):
     """
-    :param labeled_trainloader:
-    :param unlabeled_trainloader:
+    :param labeled_trainloader: 有标签数据
+    :param unlabeled_trainloader: 无标签数据
     :param model:  Mixtext 模型
     :param optimizer: 优化器
-    :param scheduler:
+    :param scheduler: 动态更新学习率
     :param criterion: 损失函数
     :param epoch:
     :param n_labels: 标签类别数量
@@ -195,7 +189,7 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, schedule
     labeled_train_iter = iter(labeled_trainloader)
     unlabeled_train_iter = iter(unlabeled_trainloader)
     model.train()
-
+    #设定更改温度T的条件
     global total_steps
     global flag
     if flag == 0 and total_steps > args.temp_change:
@@ -206,33 +200,18 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, schedule
     for batch_idx in range(args.val_iteration):
 
         total_steps += 1
-
+        #如果训练集不做数据增强
         if not train_aug:
-            try:
-                inputs_x, targets_x, inputs_x_length = labeled_train_iter.next()
-            except:
-                labeled_train_iter = iter(labeled_trainloader)
-                inputs_x, targets_x, inputs_x_length = labeled_train_iter.next()
+            inputs_x, targets_x, inputs_x_length = labeled_train_iter.next()
+        #训练集做数据增强
         else:
-            try:
-                (inputs_x, inputs_x_aug), (targets_x, _), (inputs_x_length,
-                                                           inputs_x_length_aug) = labeled_train_iter.next()
-            except:
-                labeled_train_iter = iter(labeled_trainloader)
-                (inputs_x, inputs_x_aug), (targets_x, _), (inputs_x_length,
-                                                           inputs_x_length_aug) = labeled_train_iter.next()
-        try:
-            (inputs_u, inputs_u2,  inputs_ori), (length_u,
-                                                 length_u2,  length_ori) = unlabeled_train_iter.next()
-        except:
-            unlabeled_train_iter = iter(unlabeled_trainloader)
-            (inputs_u, inputs_u2, inputs_ori), (length_u,
-                                                length_u2, length_ori) = unlabeled_train_iter.next()
-
+            (inputs_x, inputs_x_aug), (targets_x, _), (inputs_x_length, inputs_x_length_aug) = labeled_train_iter.next()
+            (inputs_u, inputs_u2,  inputs_ori), (length_u,length_u2,  length_ori) = unlabeled_train_iter.next()
         batch_size = inputs_x.size(0)
+        #原始输入句子的批次
         batch_size_2 = inputs_ori.size(0)
-        targets_x = torch.zeros(batch_size, n_labels).scatter_(
-            1, targets_x.view(-1, 1), 1)
+        #targets_x 做成one_hot编码
+        targets_x = torch.zeros(batch_size, n_labels).scatter_(1, targets_x.view(-1, 1), 1)
         if n_gpu != 0:
             inputs_x, targets_x = inputs_x.cuda(), targets_x.cuda(non_blocking=True)
             inputs_u = inputs_u.cuda()
@@ -242,42 +221,44 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, schedule
         mask = []
 
         with torch.no_grad():
-            # 对无标签数据预测标签
+            # 对无标签数据预测标签, 预测出的类别置信度
             outputs_u = model(inputs_u)
             outputs_u2 = model(inputs_u2)
             outputs_ori = model(inputs_ori)
 
-            # Based on translation qualities, choose different weights here.
+            # 根据不同数据翻译后的质量，给与不同的权重
             # For AG News: German: 1, Russian: 0, ori: 1
             # For DBPedia: German: 1, Russian: 1, ori: 1
             # For IMDB: German: 0, Russian: 0, ori: 1
             # For Yahoo Answers: German: 1, Russian: 0, ori: 1 / German: 0, Russian: 0, ori: 1
-            p = (0 * torch.softmax(outputs_u, dim=1) + 0 * torch.softmax(outputs_u2,
-                                                                         dim=1) + 1 * torch.softmax(outputs_ori, dim=1)) / (1)
-            # Do a sharpen here.
+            p = (0 * torch.softmax(outputs_u, dim=1) + 0 * torch.softmax(outputs_u2,dim=1) + 1 * torch.softmax(outputs_ori, dim=1)) / (1)
+            # sharpen 计算，p的n次方, 如果T是0.5，那么pt就是p的平方值
             pt = p**(1/args.T)
+            # targets_u 是求一个百分比
             targets_u = pt / pt.sum(dim=1, keepdim=True)
             targets_u = targets_u.detach()
-
+        #是否使用mix, 1表示已经mix，是一个flag
         mixed = 1
 
+        # 训练时是否随机选择在mix和unmix之间
         if args.co:
             mix_ = np.random.choice([0, 1], 1)[0]
         else:
             mix_ = 1
-
+        # 如果使用mix，设置beta分布参数 beta分布的alpha参数 lbeta, lbeta是一个浮点数, beta分布的参数alpha,beta, Dirichlet 分布是由 Beta 分布推广而来的
         if mix_ == 1:
-            l = np.random.beta(args.alpha, args.alpha)
+            lbeta = np.random.beta(args.alpha, args.alpha)
             if args.separate_mix:
-                l = l
+                lbeta = lbeta
             else:
-                l = max(l, 1-l)
+                lbeta = max(lbeta, 1-lbeta)
         else:
-            l = 1
-
+            lbeta = 1
+        #选择哪一层进行mix_layer, 随机选择一层，减去1是为了和列表索引相对应,例如选择bert的第11层
         mix_layer = np.random.choice(args.mix_layers_set, 1)[0]
         mix_layer = mix_layer - 1
 
+        #如果不使用数据增强
         if not train_aug:
             all_inputs = torch.cat(
                 [inputs_x, inputs_u, inputs_u2, inputs_ori, inputs_ori], dim=0)
@@ -288,6 +269,7 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, schedule
             all_targets = torch.cat(
                 [targets_x, targets_u, targets_u, targets_u, targets_u], dim=0)
 
+        #如果使用数据增强，拼接所有输入，长度和标签（无标签数据预测出来的标签)
         else:
             all_inputs = torch.cat(
                 [inputs_x, inputs_x_aug, inputs_u, inputs_u2, inputs_ori], dim=0)
@@ -295,37 +277,37 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, schedule
                 [inputs_x_length, inputs_x_length, length_u, length_u2, length_ori], dim=0)
             all_targets = torch.cat(
                 [targets_x, targets_x, targets_u, targets_u, targets_u], dim=0)
-
+        #分别进行mix, 是从batch_size 获取，还是从全部数据获取
         if args.separate_mix:
+            #随机打乱函数randperm，获取索引，就是把无标签，有标签和数据增强的数据随机抽取出来进行训练
             idx1 = torch.randperm(batch_size)
             idx2 = torch.randperm(all_inputs.size(0) - batch_size) + batch_size
             idx = torch.cat([idx1, idx2], dim=0)
 
         else:
             idx1 = torch.randperm(all_inputs.size(0) - batch_size_2)
-            idx2 = torch.arange(batch_size_2) + \
-                all_inputs.size(0) - batch_size_2
+            idx2 = torch.arange(batch_size_2) + all_inputs.size(0) - batch_size_2
             idx = torch.cat([idx1, idx2], dim=0)
-
+        #input_a是所有输入，input_b是抽取的部分输入,input和target都是embedding后的向量，length_a,length_b是原始的seq_length,未加padding时候的
         input_a, input_b = all_inputs, all_inputs[idx]
         target_a, target_b = all_targets, all_targets[idx]
         length_a, length_b = all_lengths, all_lengths[idx]
 
         if args.mix_method == 0:
-            # Mix句子的隐藏向量
-            logits = model(input_a, input_b, l, mix_layer)
-            mixed_target = l * target_a + (1 - l) * target_b
+            # Mix句子的隐藏向量,input_a是所有输入，input_b是随机抽取的输入
+            logits = model(input_a, input_b, lbeta, mix_layer)
 
+            mixed_target = lbeta * target_a + (1 - lbeta) * target_b
         elif args.mix_method == 1:
-            # Concat snippet of two training sentences, the snippets are selected based on l
-            # For example: "I lova you so much" and "He likes NLP" could be mixed as "He likes NLP so much".
-            # The corresponding labels are mixed with coefficient as well
+            # 拼接2个训练句子的片段，  片段的选择根据beta分布lbeta
+            # 例如: "I love you so much" 和 "He likes NLP" 可能混合成 "He likes NLP so much".
+            # 对应的labels也会根据系数被混合
             mixed_input = []
-            if l != 1:
+            if lbeta != 1:
                 for i in range(input_a.size(0)):
-                    length1 = math.floor(int(length_a[i]) * l)
+                    length1 = math.floor(int(length_a[i]) * lbeta)
                     idx1 = torch.randperm(int(length_a[i]) - length1 + 1)[0]
-                    length2 = math.ceil(int(length_b[i]) * (1-l))
+                    length2 = math.ceil(int(length_b[i]) * (1-lbeta))
                     if length1 + length2 > 256:
                         length2 = 256-length1 - 1
                     idx2 = torch.randperm(int(length_b[i]) - length2 + 1)[0]
@@ -335,8 +317,7 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, schedule
                         else:
                             mixed_input.append(torch.cat((input_a[i][idx1: idx1 + length1], torch.tensor([102]), input_b[i][idx2:idx2 + length2], torch.tensor([0]*(256-1-length1-length2))), dim=0).unsqueeze(0))
                     except:
-                        print(256 - 1 - length1 - length2,
-                              idx2, length2, idx1, length1)
+                        print(256 - 1 - length1 - length2,idx2, length2, idx1, length1)
 
                 mixed_input = torch.cat(mixed_input, dim=0)
 
@@ -344,12 +325,12 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, schedule
                 mixed_input = input_a
 
             logits = model(mixed_input)
-            mixed_target = l * target_a + (1 - l) * target_b
+            mixed_target = lbeta * target_a + (1 - lbeta) * target_b
 
         elif args.mix_method == 2:
-            # Concat two training sentences
-            # The corresponding labels are averaged
-            if l == 1:
+            # 拼接2个句子
+            # 对应的label是平均值
+            if lbeta == 1:
                 mixed_input = []
                 for i in range(input_a.size(0)):
                     if n_gpu != 0:
@@ -377,6 +358,7 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, schedule
             loss = Lx + w * Lu + w2 * Lu2
 
         #max_grad_norm = 1.0
+        # 梯度裁剪
         #torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
         optimizer.zero_grad()
         loss.backward()
