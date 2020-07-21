@@ -42,7 +42,6 @@ parser.add_argument('--un-labeled', default=5000, type=int,
 parser.add_argument('--val-iteration', type=int, default=200,
                     help='迭代次数')
 
-
 parser.add_argument('--mix-option', default=True, type=bool, metavar='N',
                     help='mix选项,是否要进行mix操作')
 parser.add_argument('--mix-method', default=0, type=int, metavar='N',
@@ -206,7 +205,7 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, schedule
         #训练集做数据增强
         else:
             (inputs_x, inputs_x_aug), (targets_x, _), (inputs_x_length, inputs_x_length_aug) = labeled_train_iter.next()
-            (inputs_u, inputs_u2,  inputs_ori), (length_u,length_u2,  length_ori) = unlabeled_train_iter.next()
+            (inputs_u,  inputs_ori), (length_u,  length_ori) = unlabeled_train_iter.next()
         batch_size = inputs_x.size(0)
         #原始输入句子的批次
         batch_size_2 = inputs_ori.size(0)
@@ -215,7 +214,6 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, schedule
         if n_gpu != 0:
             inputs_x, targets_x = inputs_x.cuda(), targets_x.cuda(non_blocking=True)
             inputs_u = inputs_u.cuda()
-            inputs_u2 = inputs_u2.cuda()
             inputs_ori = inputs_ori.cuda()
 
         mask = []
@@ -261,10 +259,10 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, schedule
         #如果不使用数据增强
         if not train_aug:
             all_inputs = torch.cat(
-                [inputs_x, inputs_u, inputs_u2, inputs_ori, inputs_ori], dim=0)
+                [inputs_x, inputs_u, inputs_ori, inputs_ori], dim=0)
 
             all_lengths = torch.cat(
-                [inputs_x_length, length_u, length_u2, length_ori, length_ori], dim=0)
+                [inputs_x_length, length_u, length_ori, length_ori], dim=0)
 
             all_targets = torch.cat(
                 [targets_x, targets_u, targets_u, targets_u, targets_u], dim=0)
@@ -272,9 +270,9 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, schedule
         #如果使用数据增强，拼接所有输入，长度和标签（无标签数据预测出来的标签)
         else:
             all_inputs = torch.cat(
-                [inputs_x, inputs_x_aug, inputs_u, inputs_u2, inputs_ori], dim=0)
+                [inputs_x, inputs_x_aug, inputs_u, inputs_ori], dim=0)
             all_lengths = torch.cat(
-                [inputs_x_length, inputs_x_length, length_u, length_u2, length_ori], dim=0)
+                [inputs_x_length, inputs_x_length, length_u, length_ori], dim=0)
             all_targets = torch.cat(
                 [targets_x, targets_x, targets_u, targets_u, targets_u], dim=0)
         #分别进行mix, 是使用batch_size个还是全部，是从batch_size 获取，还是从全部数据获取
@@ -424,7 +422,6 @@ class SemiLoss(object):
         :return:
         """
         if args.mix_method == 0 or args.mix_method == 1:
-
             #有监督的x的损失
             Lx = - \
                 torch.mean(torch.sum(F.log_softmax(

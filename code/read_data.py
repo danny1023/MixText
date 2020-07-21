@@ -241,7 +241,7 @@ class loader_unlabeled(Dataset):
             text1 = translator.translate(text, dest='en')
             text2 = translator.translate(text1.text, dest='zh-cn')
             self.trans_dist[text] = text2.text
-        return self.trans_dist[text], self.trans_dist[text], text
+        return self.trans_dist[text], text
 
     def get_tokenized(self, text):
         """
@@ -266,11 +266,10 @@ class loader_unlabeled(Dataset):
         #如果做数据增强
         if self.train_aug:
             # 数据增强的文本augtext_u和augtext_v， 原始文本ori_text
-            augtext_u, augtext_v, ori_text = self.augment(self.text[idx])
+            augtext_u, ori_text = self.augment(self.text[idx])
             encode_result_u, length_u = self.get_tokenized(augtext_u)
-            encode_result_v, length_v = self.get_tokenized(augtext_v)
             encode_result_ori, length_ori = self.get_tokenized(ori_text)
-            return ((torch.tensor(encode_result_u), torch.tensor(encode_result_v), torch.tensor(encode_result_ori)), (length_u, length_v, length_ori))
+            return ((torch.tensor(encode_result_u), torch.tensor(encode_result_ori)), (length_u,length_ori))
         #如果不做数据增强
         else:
             text = self.text[idx]
