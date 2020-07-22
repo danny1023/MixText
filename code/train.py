@@ -219,9 +219,8 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, schedule
         mask = []
 
         with torch.no_grad():
-            # 对无标签数据预测标签, 预测出的类别置信度, 首先猜测无标签数据的低熵标签
+            # 对无标签数据预测标签, outputs_u是对增强的无标签数据预测，预测出的类别置信度, 首先猜测无标签数据的低熵标签
             outputs_u = model(inputs_u)
-            outputs_u2 = model(inputs_u2)
             outputs_ori = model(inputs_ori)
 
             # 根据不同数据翻译后的质量，给与不同的权重
@@ -229,10 +228,10 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, schedule
             # For DBPedia: German: 1, Russian: 1, ori: 1
             # For IMDB: German: 0, Russian: 0, ori: 1
             # For Yahoo Answers: German: 1, Russian: 0, ori: 1 / German: 0, Russian: 0, ori: 1
-            p = (0 * torch.softmax(outputs_u, dim=1) + 0 * torch.softmax(outputs_u2,dim=1) + 1 * torch.softmax(outputs_ori, dim=1)) / (1)
+            p = (0 * torch.softmax(outputs_u, dim=1)  + 1 * torch.softmax(outputs_ori, dim=1)) / (1)
             # sharpen 计算，p的n次方, 如果T是0.5，那么pt就是p的平方值
             pt = p**(1/args.T)
-            # targets_u 是求一个百分比
+            # targets_u 是求一个百分比,是论文中标签猜测算法部分
             targets_u = pt / pt.sum(dim=1, keepdim=True)
             targets_u = targets_u.detach()
         #是否使用mix, 1表示已经mix，是一个flag
@@ -274,7 +273,7 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, schedule
             all_lengths = torch.cat(
                 [inputs_x_length, inputs_x_length, length_u, length_ori], dim=0)
             all_targets = torch.cat(
-                [targets_x, targets_x, targets_u, targets_u, targets_u], dim=0)
+                [targets_x, targets_x, targets_u, targets_u], dim=0)
         #分别进行mix, 是使用batch_size个还是全部，是从batch_size 获取，还是从全部数据获取
         if args.separate_mix:
             #随机打乱函数randperm，获取索引，就是把无标签，有标签和数据增强的数据随机抽取出来进行训练
@@ -346,10 +345,10 @@ def train(labeled_trainloader, unlabeled_trainloader, model, optimizer, schedule
                 mixed_target = target_a
                 logits = model(mixed_input, sent_size=256)
                 mixed = 1
-
+        #使用SemiLoss计算损失
         Lx, Lu, w, Lu2, w2 = criterion(logits[:batch_size], mixed_target[:batch_size], logits[batch_size:-batch_size_2],
                                        mixed_target[batch_size:-batch_size_2], logits[-batch_size_2:], epoch+batch_idx/args.val_iteration, mixed)
-
+        #如果使用mix
         if mix_ == 1:
             loss = Lx + w * Lu
         else:
@@ -418,7 +417,7 @@ class SemiLoss(object):
         :param targets_u:  真实的无标签的x
         :param outputs_u_2: 模型输出的无标签x_2
         :param epoch:  迭代次数
-        :param mixed:
+        :param mixed: 是否是混合过的输出
         :return:
         """
         if args.mix_method == 0 or args.mix_method == 1:
