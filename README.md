@@ -1,5 +1,6 @@
-# MixText
-主要是以下论文的代码
+# MixText4CN
+
+以下论文是基于英文语料进行训练测试的，本项目主要基于该论文代码，将语料修改为中文。
 
 *Jiaao Chen, Zichao Yang, Diyi Yang*: MixText: Linguistically-Informed Interpolation of Hidden Space for Semi-Supervised Text Classification. In Proceedings of the 58th Annual Meeting of the Association of Computational Linguistics (ACL'2020)
 
@@ -32,6 +33,8 @@
         |__ normal_train.py --> 训练BERT baseline模型
         |__ mixtext.py --> TMix/MixText 模型代码
         |__ train.py --> 训练和测试 TMix/MixText 模型
+
+|__model/
 ```
 
 ### 下载数据
